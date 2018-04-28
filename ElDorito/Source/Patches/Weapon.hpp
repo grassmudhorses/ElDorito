@@ -50,6 +50,9 @@ namespace Patches::Weapon
 	bool SetOffsetDefaultAll();
 	bool SetOffsetDefault(std::string &weaponName);
 	bool SetOffsetModified(std::string &weaponName, Blam::Math::RealVector3D &weaponOffset);
+	void SetAllWeaponMagnetisms(float angleMult, float rangeInc);
+	void SetAllWeaponMagnetismsScalar(float angle, float range);
+	std::string DoWeaponTest(std::string in);
 
 	namespace Config
 	{

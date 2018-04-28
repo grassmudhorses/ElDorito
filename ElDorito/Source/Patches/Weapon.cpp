@@ -323,7 +323,53 @@ namespace Patches::Weapon
 			}
 		}
 	}
+	inline Blam::Tags::Items::Weapon::Flags1 operator&(Blam::Tags::Items::Weapon::Flags1 a, Blam::Tags::Items::Weapon::Flags1 b)
+	{
+		return static_cast<Blam::Tags::Items::Weapon::Flags1>(static_cast<int>(a) & static_cast<int>(b));
+	}
+	inline Blam::Tags::Items::Weapon::Flags1 operator!(Blam::Tags::Items::Weapon::Flags1 a)
+	{
+		return static_cast<Blam::Tags::Items::Weapon::Flags1>(~static_cast<int>(a));
+	}
+	void SetAllWeaponMagnetisms(float angleMult, float rangeMult)
+	{
+		for (auto &weapon : weapon_infos)
+		{
+			if (weapon.Index != 0xFFFF)
+			{
+				auto *weaponDefinition = TagInstance(weapon.Index).GetDefinition<Blam::Tags::Items::Weapon>();
+				weaponDefinition->WeaponFlags1 = weaponDefinition->WeaponFlags1 & !Blam::Tags::Items::Weapon::Flags1::AimAssistsOnlyWhenZoomed;
+				weaponDefinition->AutoaimAngle = weaponDefinition->AutoaimAngle * angleMult;
+				weaponDefinition->AutoaimRangeLong = weaponDefinition->AutoaimRangeLong * rangeMult;
+				weaponDefinition->AutoaimRangeShort = weaponDefinition->AutoaimRangeShort * rangeMult;
+			}
+		}
+	}
+	void SetAllWeaponMagnetismsScalar(float angle, float range)
+	{
+		for (auto &weapon : weapon_infos)
+		{
+			if (weapon.Index != 0xFFFF)
+			{
+				auto *weaponDefinition = TagInstance(weapon.Index).GetDefinition<Blam::Tags::Items::Weapon>();
+				weaponDefinition->WeaponFlags1 = weaponDefinition->WeaponFlags1 & !Blam::Tags::Items::Weapon::Flags1::AimAssistsOnlyWhenZoomed;
+				weaponDefinition->AutoaimAngle = angle;
+				weaponDefinition->AutoaimRangeLong = range;
+				weaponDefinition->AutoaimRangeShort = range;
+			}
+		}
+	}
 
+	std::string DoWeaponTest(std::string in)
+	{
+		auto session = Blam::Network::GetActiveSession();
+		if (!session || !session->IsEstablished())
+			return std::string("not in session");
+
+		std::stringstream ss;
+		ss << "Hi " << in << ", this does nothing yet!  Why don't you add something here?";
+		return ss.str();
+	}
 	bool SetOffsetDefaultAll()
 	{
 		if (IsMainMenu) return false;

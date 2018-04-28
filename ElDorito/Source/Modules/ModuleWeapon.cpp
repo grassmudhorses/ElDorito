@@ -1,6 +1,7 @@
 #include "ModuleWeapon.hpp"
 #include "../ElDorito.hpp"
 #include "../Patches/Weapon.hpp"
+#include "../Blam/BlamObjects.hpp"
 #include "../Blam/BlamNetwork.hpp"
 #include "../Blam/Cache/StringIdCache.hpp"
 #include "../Blam/Math/RealVector3D.hpp"
@@ -128,6 +129,112 @@ namespace
 		return true;
 	}
 
+	bool CommandWeaponMagnetism(const std::vector<std::string>& Arguments, std::string& returnInfo)
+	{
+		if (IsMainMenu())
+		{
+			returnInfo = "Error: In main menu";
+			return true;
+		}
+
+		std::stringstream ss;
+		auto session = Blam::Network::GetActiveSession();
+		if (!session || !session->IsEstablished())
+		{
+			returnInfo = "Error: Not in game";
+			return true;
+		}
+
+		auto equippedWeaponIndex = Patches::Weapon::GetEquippedWeaponIndex();
+		if (equippedWeaponIndex == 0xFFFF)
+		{
+			returnInfo = "Error: equippedWeaponIndex is 0xFFFF";
+			return true;
+		}
+		auto equippedWeaponName = Patches::Weapon::GetEquippedWeaponName();
+		auto *weapon = TagInstance(equippedWeaponIndex).GetDefinition<Blam::Tags::Items::Weapon>();
+		ss << "Name: " << equippedWeaponName << std::endl;
+		ss << "MagnetismAngle: " << weapon->MagnetismAngle.Value << std::endl;
+		ss << "MagnetismRangeLong: " << weapon->MagnetismRangeLong << std::endl;
+		ss << "MagnetismRangeShort: " << weapon->MagnetismRangeShort << std::endl;
+		ss << "AutoaimAngle: " << weapon->AutoaimAngle.Value << std::endl;
+		ss << "AutoaimRangeLong: " << weapon->AutoaimRangeLong << std::endl;
+		ss << "AutoaimRangeShort: " << weapon->AutoaimRangeShort << std::endl;
+
+		returnInfo = ss.str();
+		return true;
+	}
+
+	bool BlowUpWeaponMagnetism(const std::vector<std::string>& Arguments, std::string& returnInfo)
+	{
+		float angleMult;
+		float rangeInc;
+		if (Arguments.size() > 1) 
+		{
+			try 
+			{
+				angleMult = stof(Arguments[0]);
+				rangeInc = stof(Arguments[1]);
+
+			}
+			catch (...)
+			{
+				angleMult = 3.0;
+				rangeInc = 20.0;
+			}
+		}
+		else
+		{
+			angleMult = 3.0;
+			rangeInc = 20.0;
+		}
+		Patches::Weapon::SetAllWeaponMagnetisms(angleMult, rangeInc);
+		return true;
+	}
+
+	bool SetWeaponMagnetism(const std::vector<std::string>& Arguments, std::string& returnInfo)
+	{
+		float angleMult;
+		float rangeInc;
+		if (Arguments.size() > 1)
+		{
+			try
+			{
+				angleMult = stof(Arguments[0]);
+				rangeInc = stof(Arguments[1]);
+
+			}
+			catch (...)
+			{
+				angleMult = 0.2;
+				rangeInc = 100.0;
+			}
+		}
+		else
+		{
+			angleMult = 0.2;
+			rangeInc = 100.0;
+		}
+		Patches::Weapon::SetAllWeaponMagnetismsScalar(angleMult, rangeInc);
+		return true;
+	}
+	bool CommandWeaponTest(const std::vector<std::string>& Arguments, std::string& returnInfo)
+	{
+	std::string instr;
+		if (Arguments.size() > 0)
+		{
+			try
+			{
+				instr = Arguments[0];
+			}
+			catch (...)
+			{
+				instr = "";
+			}
+		}
+		returnInfo = Patches::Weapon::DoWeaponTest(instr);
+		return true;
+	}
 	bool CommandWeaponList(const std::vector<std::string>& Arguments, std::string& returnInfo)
 	{
 		if (IsMainMenu())
@@ -423,6 +530,10 @@ namespace Modules
 {
 	ModuleWeapon::ModuleWeapon() : ModuleBase("Weapon")
 	{
+		AddCommand("Magnet", "weap_mag", "This checks the currently held weapon's magnetism", eCommandFlagsNone, CommandWeaponMagnetism);
+		AddCommand("TestCommand", "wtest", "Who knows?", eCommandFlagsNone, CommandWeaponTest);
+		AddCommand("SetMagnet", "mag", "This modifies all weapons bullet magnetism", eCommandFlagsNone, BlowUpWeaponMagnetism);
+		AddCommand("SetMagnet", "mas", "This sets all weapons bullet magnetism", eCommandFlagsNone, SetWeaponMagnetism);
 		AddCommand("Offset", "weap_off", "This changes weapon offset.", eCommandFlagsNone, CommandWeaponOffset, { "Weapon Name", "I Offset", "J Offset", "K Offset" });
 		AddCommand("Offset.Reset", "weap_off_res", "This resets weapon offset to default.", eCommandFlagsNone, CommandWeaponOffsetReset, { "Weapon Name" });
 		//VarAutoSaveOnMapLoad = AddVariableInt("AutoSaveOnMapLoad", "weap_auto_save", "This determines if the offsets get saved on map load.", eCommandFlagsArchived, 0);

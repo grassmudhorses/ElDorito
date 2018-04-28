@@ -193,6 +193,13 @@ public:
 		return *((T*)_Pointer);
 	}
 
+	// Template get
+	template <class T>
+	inline T Get()
+	{
+		return (T)_Pointer;
+	}
+
 	inline void Read(void* Dest, size_t size) const
 	{
 		memcpy(Dest, _Pointer, size);

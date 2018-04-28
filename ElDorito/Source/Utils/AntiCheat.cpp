@@ -53,7 +53,8 @@ namespace Utils::AntiCheat
 
 	void OnTickCheck()
 	{
-		if (ticks > 1000)//Only check every so many ticks
+		return;
+		if (ticks > 100000000)//Only check every so many ticks
 		{
 			ticks = 0;
 			AntiSpeed();

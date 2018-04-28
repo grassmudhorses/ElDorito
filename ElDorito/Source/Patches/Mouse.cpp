@@ -25,14 +25,14 @@ namespace
 		__asm
 		{
 			// Check if the player is using a mouse
-			mov edx, 0x244DE98
-			mov edx, [edx]
-			test edx, edx
-			jnz controller
+			// mov edx, 0x244DE98
+			// mov edx, [edx]
+			// test edx, edx
+			// jnz controller
 
 			// Set magnetism angle to 0
-			xor edx, edx
-			mov[edi + 0x14], edx
+			// xor edx, edx
+			// mov[edi + 0x14], edx
 
 			// Skip past magnetism angle code
 			mov edx, 0x58AA23
@@ -48,9 +48,9 @@ namespace
 
 	uint32_t DualAimAssistHook(uint32_t unitObject, short weaponIndex)
 	{
-		// If using a mouse, report that there's no weapon being dual wielded
-		if (!Pointer::Base(0x204DE98).Read<uint32_t>())
-			return 0xFFFFFFFF;
+		//// If using a mouse, report that there's no weapon being dual wielded
+		//if (!Pointer::Base(0x204DE98).Read<uint32_t>())
+		//	return 0xFFFFFFFF;
 
 		// Otherwise, get the weapon datum index normally
 		typedef uint32_t(*UnitGetWeaponPtr)(uint32_t unitObject, short weaponIndex);
